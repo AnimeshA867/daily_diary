@@ -15,12 +15,14 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Daily Diary - Your Private, Encrypted Journal",
-  description: "A secure, end-to-end encrypted personal diary application. Write freely, knowing your thoughts are protected by military-grade encryption.",
+  description:
+    "A secure, end-to-end encrypted personal diary application. Write freely, knowing your thoughts are protected by military-grade encryption.",
   keywords: ["diary", "journal", "encrypted", "private", "secure", "personal"],
   authors: [{ name: "Daily Diary" }],
   openGraph: {
     title: "Daily Diary - Your Private, Encrypted Journal",
-    description: "Write freely in your private, encrypted diary. Your thoughts are secure with military-grade encryption.",
+    description:
+      "Write freely in your private, encrypted diary. Your thoughts are secure with military-grade encryption.",
     type: "website",
   },
 };

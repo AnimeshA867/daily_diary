@@ -9,9 +9,12 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* About Section */}
           <div>
-            <h3 className="text-lg font-semibold text-foreground mb-4">Daily Diary</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-4">
+              Daily Diary
+            </h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Your private, encrypted personal journal. Write freely, knowing your thoughts are secure.
+              Your private, encrypted personal journal. Write freely, knowing
+              your thoughts are secure.
             </p>
             <p className="text-xs text-muted-foreground">
               🔒 End-to-end encrypted
@@ -170,9 +173,8 @@ export default function Footer() {
         {/* Security Badge */}
         <div className="mt-6 text-center">
           <p className="text-xs text-muted-foreground">
-            🔒 Protected by AES-GCM 256-bit encryption • 
-            Your diary is private and secure •
-            We cannot read your entries
+            🔒 Protected by AES-GCM 256-bit encryption • Your diary is private
+            and secure • We cannot read your entries
           </p>
         </div>
       </div>
