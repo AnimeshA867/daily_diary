@@ -3,6 +3,9 @@
  * Each user's content is encrypted with a key derived from their user ID
  */
 
+import { createClient } from "./client";
+import { getCachedEncryptionSalt, cacheEncryptionSalt } from "./redis";
+
 // Generate a consistent encryption key for a user based on their user ID
 async function deriveKey(userId: string, salt: string): Promise<CryptoKey> {
   const encoder = new TextEncoder();
@@ -28,20 +31,55 @@ async function deriveKey(userId: string, salt: string): Promise<CryptoKey> {
   );
 }
 
-// Get or generate a salt for the user (store in localStorage)
-function getUserSalt(userId: string): string {
-  const saltKey = `diary_salt_${userId}`;
-  let salt = localStorage.getItem(saltKey);
-
-  if (!salt) {
-    // Generate a random salt for this user
-    const array = new Uint8Array(16);
-    crypto.getRandomValues(array);
-    salt = Array.from(array, (byte) => byte.toString(16).padStart(2, "0")).join(
-      ""
-    );
-    localStorage.setItem(saltKey, salt);
+// Get or generate a salt for the user (store in database + cache in Redis)
+async function getUserSalt(userId: string): Promise<string> {
+  // Try Redis cache first
+  const cachedSalt = await getCachedEncryptionSalt(userId);
+  if (cachedSalt) {
+    return cachedSalt;
   }
+
+  const supabase = createClient();
+
+  // Try to fetch existing salt from database
+  const { data, error } = await supabase
+    .from("user_encryption_keys")
+    .select("encryption_salt")
+    .eq("user_id", userId)
+    .single();
+
+  if (data && data.encryption_salt) {
+    console.log("Retrieved existing salt from database");
+    // Cache it for next time
+    await cacheEncryptionSalt(userId, data.encryption_salt);
+    return data.encryption_salt;
+  }
+
+  // If no salt exists, generate a new one
+  console.log("Generating new salt for user");
+  const array = new Uint8Array(16);
+  crypto.getRandomValues(array);
+  const salt = Array.from(array, (byte) =>
+    byte.toString(16).padStart(2, "0")
+  ).join("");
+
+  // Store the new salt in database
+  const { error: insertError } = await supabase
+    .from("user_encryption_keys")
+    .insert({
+      user_id: userId,
+      encryption_salt: salt,
+    });
+
+  if (insertError) {
+    console.error("Failed to store salt in database:", insertError);
+    throw new Error("Failed to initialize encryption key");
+  }
+
+  console.log("New salt stored in database");
+
+  // Cache the new salt
+  await cacheEncryptionSalt(userId, salt);
 
   return salt;
 }
@@ -58,7 +96,7 @@ export async function encryptContent(
 ): Promise<string> {
   try {
     const encoder = new TextEncoder();
-    const salt = getUserSalt(userId);
+    const salt = await getUserSalt(userId);
     const key = await deriveKey(userId, salt);
 
     // Generate a random IV for this encryption
@@ -95,17 +133,34 @@ export async function decryptContent(
   userId: string
 ): Promise<string> {
   try {
-    const salt = getUserSalt(userId);
+    console.log("Decryption attempt:", {
+      contentLength: encryptedContent.length,
+      userId: userId.substring(0, 8) + "...",
+      isBase64: /^[A-Za-z0-9+/]+=*$/.test(encryptedContent),
+    });
+
+    const salt = await getUserSalt(userId);
+    console.log("Salt retrieved:", salt.substring(0, 8) + "...");
+
     const key = await deriveKey(userId, salt);
+    console.log("Key derived successfully");
 
     // Decode from base64
     const combined = Uint8Array.from(atob(encryptedContent), (c) =>
       c.charCodeAt(0)
     );
+    console.log("Base64 decoded, total bytes:", combined.length);
 
     // Extract IV and encrypted data
     const iv = combined.slice(0, 12);
     const encrypted = combined.slice(12);
+    console.log(
+      "IV extracted:",
+      iv.length,
+      "bytes, Encrypted data:",
+      encrypted.length,
+      "bytes"
+    );
 
     // Decrypt the content
     const decrypted = await crypto.subtle.decrypt(
@@ -113,21 +168,48 @@ export async function decryptContent(
       key,
       encrypted
     );
+    console.log("Decryption successful");
 
     const decoder = new TextDecoder();
-    return decoder.decode(decrypted);
+    const result = decoder.decode(decrypted);
+    console.log("Content decoded, length:", result.length);
+    return result;
   } catch (error) {
-    console.error("Decryption failed:", error);
+    console.error("Decryption failed with error:", error);
+    console.error(
+      "Error type:",
+      error instanceof Error ? error.name : typeof error
+    );
+    console.error(
+      "Error message:",
+      error instanceof Error ? error.message : String(error)
+    );
     throw new Error("Failed to decrypt content");
   }
 }
 
 /**
  * Check if content appears to be encrypted (base64 format)
+ * More robust checking to avoid false positives
  */
 export function isEncrypted(content: string): boolean {
-  if (!content) return false;
+  if (!content || content.length < 20) return false;
+
   // Check if it looks like base64
   const base64Regex = /^[A-Za-z0-9+/]+=*$/;
-  return base64Regex.test(content) && content.length > 20;
+  if (!base64Regex.test(content)) return false;
+
+  // Check if it has spaces or common words (would indicate plaintext)
+  if (content.includes(" ") || content.includes("\n")) return false;
+
+  // Check for common English words that wouldn't be in encrypted content
+  const commonWords = ["the", "and", "for", "was", "today", "feel", "my", "I"];
+  const lowerContent = content.toLowerCase();
+  for (const word of commonWords) {
+    if (lowerContent.includes(word)) return false;
+  }
+
+  // Base64 encoded encrypted content should be reasonably long and uniform
+  // Our encryption adds 12 bytes for IV, so minimum would be around 20-30 chars
+  return content.length > 30;
 }

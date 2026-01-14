@@ -4,7 +4,13 @@ import { useState, useEffect } from "react";
 import { format, isToday } from "date-fns";
 import { Save, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { createClient } from "@/lib/client";
-import { encryptContent, decryptContent } from "@/lib/encryption";
+import { encryptContent, decryptContent, isEncrypted } from "@/lib/encryption";
+import {
+  getCachedDiaryEntry,
+  cacheDiaryEntry,
+  isDateCacheable,
+  invalidateDiaryEntry,
+} from "@/lib/redis";
 
 interface DailyWriterProps {
   user: {
@@ -24,6 +30,7 @@ export default function DailyWriter({
   const [isSaving, setIsSaving] = useState(false);
   const [wordCount, setWordCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [decryptionError, setDecryptionError] = useState(false);
 
   const today = new Date();
   const currentDate = selectedDate ? new Date(selectedDate) : today;
@@ -33,24 +40,98 @@ export default function DailyWriter({
   useEffect(() => {
     const loadEntry = async () => {
       setIsLoading(true);
+
+      // Try cache first for past dates
+      if (isDateCacheable(dateStr)) {
+        const cached = await getCachedDiaryEntry(user.id, dateStr);
+        if (cached) {
+          console.log("📦 Loaded from cache:", dateStr);
+          try {
+            if (isEncrypted(cached.content)) {
+              const decryptedContent = await decryptContent(
+                cached.content,
+                user.id
+              );
+              setContent(decryptedContent);
+              setDecryptionError(false);
+            } else {
+              setContent(cached.content);
+              setDecryptionError(false);
+            }
+            setIsLoading(false);
+            return;
+          } catch (error) {
+            console.error("Cache decryption failed:", error);
+            // Continue to database fetch
+          }
+        }
+      }
+
+      // Fetch from database
       const supabase = createClient();
       const { data } = await supabase
         .from("diary_entries")
-        .select("content")
+        .select("content, word_count")
         .eq("user_id", user.id)
         .eq("entry_date", dateStr)
         .single();
 
       if (data && data.content) {
+        console.log("Content loaded from DB:", {
+          length: data.content.length,
+          firstChars: data.content.substring(0, 50),
+          isLikelyEncrypted: isEncrypted(data.content),
+        });
+
         try {
-          // Decrypt the content before displaying
-          const decryptedContent = await decryptContent(data.content, user.id);
-          setContent(decryptedContent);
+          // Check if content is encrypted
+          if (isEncrypted(data.content)) {
+            console.log("Content appears encrypted, attempting decryption...");
+            // Decrypt the content before displaying
+            const decryptedContent = await decryptContent(
+              data.content,
+              user.id
+            );
+            console.log("Decryption successful!");
+            setContent(decryptedContent);
+            setDecryptionError(false);
+
+            // Cache the entry if it's a past date
+            if (isDateCacheable(dateStr)) {
+              await cacheDiaryEntry(
+                user.id,
+                dateStr,
+                data.content,
+                data.word_count || 0
+              );
+            }
+          } else {
+            // Content is plaintext (old entry from before encryption)
+            console.log(
+              "Loading plaintext entry (created before encryption was enabled)"
+            );
+            setContent(data.content);
+            setDecryptionError(false);
+
+            // Cache plaintext entries too
+            if (isDateCacheable(dateStr)) {
+              await cacheDiaryEntry(
+                user.id,
+                dateStr,
+                data.content,
+                data.word_count || 0
+              );
+            }
+          }
         } catch (error) {
           console.error("Failed to decrypt content:", error);
-          setContent(""); // Show empty if decryption fails
+          // If decryption fails, show as plaintext (might be old entry)
+          console.log("Decryption failed, showing content as plaintext");
+          setContent(data.content);
+          setDecryptionError(true);
         }
       } else {
+        console.log("No entry found for this date");
         setContent("");
       }
       setIsLoading(false);
@@ -87,6 +168,11 @@ export default function DailyWriter({
             onConflict: "user_id,entry_date",
           }
         );
+
+        // Invalidate cache if this is a past date being edited
+        if (isDateCacheable(dateStr)) {
+          await invalidateDiaryEntry(user.id, dateStr);
+        }
       } catch (error) {
         console.error("Failed to save encrypted content:", error);
       }
@@ -117,6 +203,11 @@ export default function DailyWriter({
           onConflict: "user_id,entry_date",
         }
       );
+
+      // Invalidate cache if this is a past date being edited
+      if (isDateCacheable(dateStr)) {
+        await invalidateDiaryEntry(user.id, dateStr);
+      }
 
       setIsSaved(true);
       setTimeout(() => setIsSaved(false), 2000);
@@ -152,6 +243,37 @@ export default function DailyWriter({
 
   return (
     <div className="bg-surface border border-border rounded-lg p-6 flex flex-col h-full">
+      {/* Decryption Error Warning */}
+      {decryptionError && (
+        <div className="mb-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 p-4 rounded-lg">
+          <div className="flex items-start gap-3">
+            <span className="text-amber-600 dark:text-amber-400 text-xl">
+              ⚠️
+            </span>
+            <div className="flex-1">
+              <h4 className="font-semibold text-amber-900 dark:text-amber-100 mb-1">
+                Decryption Failed
+              </h4>
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                This entry appears to be encrypted but couldn&apos;t be
+                decrypted. This may happen if:
+              </p>
+              <ul className="text-sm text-amber-800 dark:text-amber-200 list-disc pl-5 mt-2 space-y-1">
+                <li>You cleared your browser data (encryption keys lost)</li>
+                <li>
+                  You&apos;re accessing from a different device or browser
+                </li>
+                <li>The encryption salt is missing from localStorage</li>
+              </ul>
+              <p className="text-sm text-amber-800 dark:text-amber-200 mt-2">
+                The encrypted content is shown below. To recover it, you&apos;ll
+                need to restore your encryption salt.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
