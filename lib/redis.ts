@@ -5,11 +5,20 @@
 
 import { Redis } from "@upstash/redis";
 
-// Initialize Redis client
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-});
+// Initialize Redis client (only if env vars are available)
+let redis: Redis | null = null;
+
+if (typeof window !== "undefined") {
+  // Client-side
+  const url = process.env.NEXT_PUBLIC_UPSTASH_REDIS_REST_URL;
+  const token = process.env.NEXT_PUBLIC_UPSTASH_REDIS_REST_TOKEN;
+
+  if (url && token) {
+    redis = new Redis({ url, token });
+  } else {
+    console.warn("Redis not configured - caching disabled");
+  }
+}
 
 // Cache keys
 const CACHE_PREFIX = "diary";
@@ -74,6 +83,8 @@ export async function cacheDiaryEntry(
   content: string,
   wordCount: number
 ): Promise<void> {
+  if (!redis) return;
+
   try {
     // Only cache past dates
     if (!isDateCacheable(date)) {
@@ -102,6 +113,8 @@ export async function invalidateDiaryEntry(
   userId: string,
   date: string
 ): Promise<void> {
+  if (!redis) return;
+
   try {
     const key = getDiaryEntryKey(userId, date);
     await redis.del(key);
@@ -118,6 +131,8 @@ export async function cacheEncryptionSalt(
   userId: string,
   salt: string
 ): Promise<void> {
+  if (!redis) return;
+
   try {
     const key = getEncryptionKeyKey(userId);
     // Cache encryption salts for 7 days
@@ -134,6 +149,8 @@ export async function cacheEncryptionSalt(
 export async function getCachedEncryptionSalt(
   userId: string
 ): Promise<string | null> {
+  if (!redis) return null;
+
   try {
     const key = getEncryptionKeyKey(userId);
     const salt = await redis.get<string>(key);
@@ -156,6 +173,8 @@ export async function getCacheStats(userId: string): Promise<{
   totalKeys: number;
   diaryEntries: number;
 }> {
+  if (!redis) return { totalKeys: 0, diaryEntries: 0 };
+
   try {
     const pattern = `${CACHE_PREFIX}:${userId}:*`;
     const keys = await redis.keys(pattern);
@@ -174,6 +193,8 @@ export async function getCacheStats(userId: string): Promise<{
  * Clear all cache for a user
  */
 export async function clearUserCache(userId: string): Promise<void> {
+  if (!redis) return;
+
   try {
     const pattern = `${CACHE_PREFIX}:${userId}:*`;
     const keys = await redis.keys(pattern);
