@@ -57,6 +57,8 @@ export async function getCachedDiaryEntry(
   userId: string,
   date: string
 ): Promise<{ content: string; word_count: number } | null> {
+  if (!redis) return null;
+
   try {
     const key = getDiaryEntryKey(userId, date);
     const cached = await redis.get<{ content: string; word_count: number }>(
