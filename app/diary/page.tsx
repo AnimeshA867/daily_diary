@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/client";
+import { getStreakData } from "@/lib/streak";
 import { format } from "date-fns";
 import CalendarGrid from "@/components/calendar-grid";
 import DailyWriter from "@/components/daily-writer";
@@ -42,46 +43,10 @@ export default function DiaryPage() {
       if (entriesData) {
         setEntries(entriesData);
 
-        // Calculate streaks
-        let tempCurrentStreak = 0;
-        let tempLongestStreak = 0;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        if (entriesData.length > 0) {
-          const entryDates = entriesData
-            .map((e) => new Date(e.entry_date))
-            .sort((a, b) => b.getTime() - a.getTime());
-
-          const checkDate = new Date(today);
-          let tempStreak = 0;
-          let foundStreak = false;
-
-          for (const entryDate of entryDates) {
-            const diff = Math.floor(
-              (checkDate.getTime() - entryDate.getTime()) /
-                (1000 * 60 * 60 * 24)
-            );
-
-            if (diff === 0) {
-              tempStreak++;
-              foundStreak = true;
-              checkDate.setDate(checkDate.getDate() - 1);
-            } else if (diff === 1 && tempStreak > 0) {
-              tempStreak++;
-              checkDate.setDate(checkDate.getDate() - 1);
-            } else {
-              tempLongestStreak = Math.max(tempLongestStreak, tempStreak);
-              tempStreak = 0;
-              if (!foundStreak) break;
-            }
-          }
-          tempLongestStreak = Math.max(tempLongestStreak, tempStreak);
-          tempCurrentStreak = foundStreak ? tempStreak : 0;
-        }
-
-        setCurrentStreak(tempCurrentStreak);
-        setLongestStreak(tempLongestStreak);
+        // Get streak data from cache or calculate
+        const streakData = await getStreakData(currentUser.id);
+        setCurrentStreak(streakData.currentStreak);
+        setLongestStreak(streakData.longestStreak);
       }
 
       setIsLoading(false);

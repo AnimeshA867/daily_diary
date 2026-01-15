@@ -11,6 +11,7 @@ import {
   isDateCacheable,
   invalidateDiaryEntry,
 } from "@/lib/redis";
+import { invalidateStreakCache } from "@/lib/streak";
 
 interface DailyWriterProps {
   user: {
@@ -174,10 +175,12 @@ export default function DailyWriter({
           }
         );
 
-        // Invalidate cache if this is a past date being edited
+        // Invalidate caches
         if (isDateCacheable(dateStr)) {
           await invalidateDiaryEntry(user.id, dateStr);
         }
+        // Always invalidate streak cache when saving an entry
+        await invalidateStreakCache(user.id);
       } catch (error) {
         console.error("Failed to save encrypted content:", error);
       }
@@ -209,10 +212,12 @@ export default function DailyWriter({
         }
       );
 
-      // Invalidate cache if this is a past date being edited
+      // Invalidate caches
       if (isDateCacheable(dateStr)) {
         await invalidateDiaryEntry(user.id, dateStr);
       }
+      // Always invalidate streak cache when saving an entry
+      await invalidateStreakCache(user.id);
 
       setIsSaved(true);
       setTimeout(() => setIsSaved(false), 2000);
