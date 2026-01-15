@@ -199,17 +199,24 @@ export function isEncrypted(content: string): boolean {
   const base64Regex = /^[A-Za-z0-9+/]+=*$/;
   if (!base64Regex.test(content)) return false;
 
-  // Check if it has spaces or common words (would indicate plaintext)
+  // Check if it has spaces or newlines (encrypted base64 shouldn't have these)
   if (content.includes(" ") || content.includes("\n")) return false;
 
-  // Check for common English words that wouldn't be in encrypted content
-  const commonWords = ["the", "and", "for", "was", "today", "feel", "my", "I"];
-  const lowerContent = content.toLowerCase();
-  for (const word of commonWords) {
-    if (lowerContent.includes(word)) return false;
+  // Our encryption: 12-byte IV + encrypted content, then base64 encoded
+  // Minimum realistic encrypted content would be ~50 chars in base64
+  if (content.length < 50) return false;
+
+  // Check entropy - encrypted content should have relatively even distribution of characters
+  // If it's mostly one character or has obvious patterns, it's probably not encrypted
+  const charCounts = new Map<string, number>();
+  for (const char of content.substring(0, 100)) {
+    charCounts.set(char, (charCounts.get(char) || 0) + 1);
   }
 
-  // Base64 encoded encrypted content should be reasonably long and uniform
-  // Our encryption adds 12 bytes for IV, so minimum would be around 20-30 chars
-  return content.length > 30;
+  // If any single character appears more than 30% of the time in first 100 chars, probably not encrypted
+  const maxCount = Math.max(...charCounts.values());
+  if (maxCount > 30) return false;
+
+  // Looks encrypted!
+  return true;
 }

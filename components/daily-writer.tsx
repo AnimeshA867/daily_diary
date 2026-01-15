@@ -54,14 +54,19 @@ export default function DailyWriter({
               );
               setContent(decryptedContent);
               setDecryptionError(false);
+              setIsLoading(false);
+              return;
             } else {
               setContent(cached.content);
               setDecryptionError(false);
+              setIsLoading(false);
+              return;
             }
-            setIsLoading(false);
-            return;
           } catch (error) {
-            console.error("Cache decryption failed:", error);
+            console.error(
+              "Cache decryption failed, will fetch from DB:",
+              error
+            );
             // Continue to database fetch
           }
         }
@@ -125,14 +130,14 @@ export default function DailyWriter({
           }
         } catch (error) {
           console.error("Failed to decrypt content:", error);
-          // If decryption fails, show as plaintext (might be old entry)
-          console.log("Decryption failed, showing content as plaintext");
-          setContent(data.content);
+          // If decryption fails, show error and don't display encrypted content
+          setContent("");
           setDecryptionError(true);
         }
       } else {
         console.log("No entry found for this date");
         setContent("");
+        setDecryptionError(false);
       }
       setIsLoading(false);
     };
