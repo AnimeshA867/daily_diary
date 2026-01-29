@@ -27,6 +27,7 @@ import {
   Eye,
   EyeOff,
   LogOut,
+  LoaderIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -36,8 +37,12 @@ export default function AccountPage() {
   const [settings, setSettings] = useState<UserSettings | null>(null);
   const [streakData, setStreakData] = useState<StreakData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
+    const [password,setPassword]= useState("");
+    const [passwordChangeError,setPasswordChangeError]= useState<string | null>(null);
+    const [passwordVisible,setPasswordVisible]= useState(false);
+    const [passwordCheckStatus,setPasswordCheckStatus]= useState<"idle" | "checking" | "success" | "error">("idle");
   // Display name
+  
   const [displayName, setDisplayName] = useState("");
   const [isSavingName, setIsSavingName] = useState(false);
   const [nameSaved, setNameSaved] = useState(false);
@@ -205,6 +210,45 @@ export default function AccountPage() {
     router.push("/auth/login");
   };
 
+  const handlePasswordChange=async(action: "check"|"change")=>{
+    const supabase = createClient();
+
+    switch(action){
+        case "check":
+            setPasswordCheckStatus("checking");
+            const { data ,error  } = await supabase.auth.signInWithPassword({
+    email: user?.email || "",
+    password:password
+  })
+
+    if(error){
+        setPasswordCheckStatus("error");
+        setPasswordChangeError("Incorrect Password");
+        return;
+    }
+    setPasswordCheckStatus("success");
+            break;
+        case "change":
+            const passwordChange = await supabase.auth.updateUser({
+                password: password
+            });
+            if(passwordChange.error){
+                setPasswordCheckStatus("error");
+                setPasswordChangeError(passwordChange.error.message);
+                return;
+            }
+            setPasswordCheckStatus("success");
+            setPassword("");
+            break;
+    }
+     
+
+    
+    
+  }
+
+  
+
   if (isLoading) {
     return (
       <main className="min-h-screen bg-background flex items-center justify-center">
@@ -265,6 +309,26 @@ export default function AccountPage() {
                   {user.email}
                 </div>
               </div>
+               <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-1">
+                  Password
+                </label>
+                <div className=" rounded-lg text-foreground text-sm flex justify-between flex-col ">
+                    
+                  <input placeholder="Enter your Current Password" id="password" type="password" onKeyDown={(e)=>{
+                    if(e.key==="Enter"){
+                        handlePasswordChange("check");
+                    }
+                  }} onChange={(e)=>setPassword(e.target.value)} className={` ${passwordCheckStatus==="success"?"hidden":"block"} flex-1 px-4 py-2.5 bg-background border border-border rounded-lg text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent `}></input>
+                  <input placeholder="Enter Your New Password" id="password" type="password" onKeyDown={(e)=>{
+                    if(e.key==="Enter"){
+                        handlePasswordChange("change");
+                    }
+                  }} onChange={(e)=>setPassword(e.target.value)} className={` ${passwordCheckStatus==="success"?"block":"hidden"} flex-1 px-4 py-2.5 bg-background border border-border rounded-lg text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent relative `}></input>
+                {passwordCheckStatus==="checking" ? <LoaderIcon className="w-5 h-5 mt-2 animate-spin text-muted-foreground"/> : passwordCheckStatus==="error" ? <span className="text-red-500 m-2">{passwordChangeError}</span> : passwordCheckStatus==="success" ? <span className="text-green-500 m-2">Success!</span> : null}
+                
+                </div>
+              </div>
 
               {/* Display Name */}
               <div>
@@ -283,7 +347,7 @@ export default function AccountPage() {
                     onClick={handleSaveDisplayName}
                     disabled={isSavingName}
                     size="sm"
-                    className="px-4"
+                    className="px-4 h-10 flex items-center justify-center"
                   >
                     {nameSaved ? (
                       <Check className="w-4 h-4" />
