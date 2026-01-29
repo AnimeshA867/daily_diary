@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/client";
 import { format } from "date-fns";
 import {
@@ -70,7 +70,7 @@ export default function AccountPage() {
       } = await supabase.auth.getUser();
 
       if (!currentUser) {
-        redirect("/auth/login");
+        // Protected layout handles redirect
         return;
       }
 
@@ -204,10 +204,12 @@ export default function AccountPage() {
   };
 
   const handleLogout = async () => {
-    const supabase = createClient();
     clearPinSession();
+    const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/auth/login");
+    
+    // Force a hard navigation to clear all state
+    window.location.href = "/auth/login";
   };
 
   const handlePasswordChange=async(action: "check"|"change")=>{

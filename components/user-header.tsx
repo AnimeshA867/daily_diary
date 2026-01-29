@@ -36,12 +36,14 @@ export default function UserHeader({
   const router = useRouter();
 
   const handleLogout = async () => {
-    const supabase = createClient();
     setIsLoading(true);
     clearPinSession();
-
+    
+    const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/auth/login");
+    
+    // Force a hard navigation to clear all state
+    window.location.href = "/auth/login";
   };
 
   const userName = displayName || user.email?.split("@")[0] || "User";
@@ -134,7 +136,10 @@ export default function UserHeader({
                   {/* Menu Items */}
                   <div className="py-1">
                     <button
-                      onClick={() => router.push("/account")}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        router.push("/account");
+                      }}
                       className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors"
                     >
                       <Settings className="w-4 h-4 text-muted-foreground" />
@@ -144,7 +149,10 @@ export default function UserHeader({
 
                   <div className="border-t border-border pt-1">
                     <button
-                      onClick={handleLogout}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        handleLogout();
+                      }}
                       disabled={isLoading}
                       className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-destructive/10 transition-colors"
                     >

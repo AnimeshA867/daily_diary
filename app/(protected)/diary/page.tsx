@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/client";
 import { getStreakData, type StreakData } from "@/lib/streak";
 import { isPinEnabled, isPinSessionValid, getUserSettings } from "@/lib/pin";
@@ -151,7 +150,7 @@ export default function DiaryPage() {
       } = await supabase.auth.getUser();
 
       if (!currentUser) {
-        redirect("/auth/login");
+        // Protected layout handles redirect, but just in case
         return;
       }
 
