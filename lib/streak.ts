@@ -1,5 +1,6 @@
 /**
  * Streak calculation and caching utilities
+ * Optimized for speed with proper streak logic
  */
 
 import { createClient } from "./client";
@@ -9,10 +10,12 @@ export interface StreakData {
   currentStreak: number;
   longestStreak: number;
   lastEntryDate: string | null;
+  totalEntries: number;
+  streakActive: boolean; // true if user wrote today or yesterday
 }
 
 const STREAK_CACHE_PREFIX = "user_streak";
-const STREAK_CACHE_TTL = 4 * 60 * 60; // 4 hours in seconds
+const STREAK_CACHE_TTL = 2 * 60 * 60; // 2 hours in seconds (faster refresh)
 
 /**
  * Get cache key for user streak
@@ -22,12 +25,21 @@ function getStreakCacheKey(userId: string): string {
 }
 
 /**
- * Calculate streaks from diary entries
+ * Calculate the number of days between two dates (ignoring time)
+ */
+function daysBetween(date1: Date, date2: Date): number {
+  const d1 = new Date(date1.getFullYear(), date1.getMonth(), date1.getDate());
+  const d2 = new Date(date2.getFullYear(), date2.getMonth(), date2.getDate());
+  return Math.round((d1.getTime() - d2.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+/**
+ * Calculate streaks from diary entries - optimized version
  */
 async function calculateStreaks(userId: string): Promise<StreakData> {
   const supabase = createClient();
-  
-  // Fetch all entry dates for this user
+
+  // Fetch all entry dates for this user (only dates, ordered descending)
   const { data: entries, error } = await supabase
     .from("diary_entries")
     .select("entry_date")
@@ -39,87 +51,87 @@ async function calculateStreaks(userId: string): Promise<StreakData> {
       currentStreak: 0,
       longestStreak: 0,
       lastEntryDate: null,
+      totalEntries: 0,
+      streakActive: false,
     };
   }
 
+  // Remove duplicate dates and convert to unique date strings
+  const uniqueDateStrings = [...new Set(entries.map((e) => e.entry_date))];
+  const totalEntries = entries.length;
+
+  // Parse dates properly (entry_date is in YYYY-MM-DD format)
+  const entryDates = uniqueDateStrings.map((dateStr) => {
+    const [year, month, day] = dateStr.split("-").map(Number);
+    return new Date(year, month - 1, day); // month is 0-indexed
+  });
+
+  // Get today's date at midnight
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // Convert entry dates to Date objects and sort
-  const entryDates = entries
-    .map((e) => {
-      const date = new Date(e.entry_date);
-      date.setHours(0, 0, 0, 0);
-      return date;
-    })
-    .sort((a, b) => b.getTime() - a.getTime());
-
-  let currentStreak = 0;
-  let longestStreak = 0;
-  let tempStreak = 0;
-
-  // Check if there's an entry for today or yesterday
   const mostRecentEntry = entryDates[0];
-  const daysSinceLastEntry = Math.floor(
-    (today.getTime() - mostRecentEntry.getTime()) / (1000 * 60 * 60 * 24)
-  );
+  const daysSinceLastEntry = daysBetween(today, mostRecentEntry);
 
-  // If last entry was more than 1 day ago, current streak is broken
+  // Determine if streak is active (wrote today or yesterday)
+  const streakActive = daysSinceLastEntry <= 1;
+
+  // Calculate current streak
+  let currentStreak = 0;
+  
   if (daysSinceLastEntry > 1) {
+    // Streak is broken - no entry today or yesterday
     currentStreak = 0;
   } else {
-    // Calculate current streak from most recent entry backwards
-    let checkDate = new Date(mostRecentEntry);
+    // Start counting from the most recent entry
+    currentStreak = 1;
     
-    for (const entryDate of entryDates) {
-      const dayDiff = Math.floor(
-        (checkDate.getTime() - entryDate.getTime()) / (1000 * 60 * 60 * 24)
-      );
-
-      if (dayDiff === 0) {
-        // Same day, count it
-        tempStreak++;
-        checkDate.setDate(checkDate.getDate() - 1);
-      } else if (dayDiff === 1) {
-        // Next consecutive day
-        tempStreak++;
-        checkDate = new Date(entryDate);
-        checkDate.setDate(checkDate.getDate() - 1);
+    for (let i = 0; i < entryDates.length - 1; i++) {
+      const diff = daysBetween(entryDates[i], entryDates[i + 1]);
+      
+      if (diff === 1) {
+        // Consecutive days
+        currentStreak++;
+      } else if (diff === 0) {
+        // Same day (shouldn't happen with unique dates, but safety check)
+        continue;
       } else {
-        // Gap found, streak broken
+        // Gap found, streak ends here
         break;
       }
     }
-
-    currentStreak = tempStreak;
   }
 
-  // Calculate longest streak by finding all consecutive sequences
-  tempStreak = 1;
-  longestStreak = 1;
+  // Calculate longest streak
+  let longestStreak = 1;
+  let tempStreak = 1;
 
   for (let i = 0; i < entryDates.length - 1; i++) {
-    const dayDiff = Math.floor(
-      (entryDates[i].getTime() - entryDates[i + 1].getTime()) /
-        (1000 * 60 * 60 * 24)
-    );
-
-    if (dayDiff === 1) {
-      // Consecutive day
+    const diff = daysBetween(entryDates[i], entryDates[i + 1]);
+    
+    if (diff === 1) {
       tempStreak++;
       longestStreak = Math.max(longestStreak, tempStreak);
-    } else {
-      // Gap found, reset temp streak
+    } else if (diff > 1) {
       tempStreak = 1;
     }
   }
 
+  // Ensure longest streak is at least as long as current streak
   longestStreak = Math.max(longestStreak, currentStreak);
+
+  // Edge case: if only one entry, both streaks are 1 (if active) or 0 (if broken)
+  if (entryDates.length === 1) {
+    longestStreak = 1;
+    currentStreak = streakActive ? 1 : 0;
+  }
 
   return {
     currentStreak,
     longestStreak,
-    lastEntryDate: entries[0].entry_date,
+    lastEntryDate: uniqueDateStrings[0],
+    totalEntries,
+    streakActive,
   };
 }
 
@@ -185,7 +197,7 @@ export async function updateStreakOnEntrySave(
 ): Promise<void> {
   // Invalidate cache so next fetch recalculates
   await invalidateStreakCache(userId);
-  
+
   // Optionally pre-calculate and cache the new streak
   await getStreakData(userId);
 }
