@@ -202,9 +202,10 @@ export function isEncrypted(content: string): boolean {
   // Check if it has spaces or newlines (encrypted base64 shouldn't have these)
   if (content.includes(" ") || content.includes("\n")) return false;
 
-  // Our encryption: 12-byte IV + encrypted content, then base64 encoded
-  // Minimum realistic encrypted content would be ~50 chars in base64
-  if (content.length < 50) return false;
+  // Our encryption: 12-byte IV + encrypted content + 16-byte auth tag, then base64 encoded
+  // Minimum: 12 (IV) + 1 (data) + 16 (tag) = 29 bytes raw = 40 chars in base64
+  // Using 32 as minimum to be safe
+  if (content.length < 32) return false;
 
   // Check entropy - encrypted content should have relatively even distribution of characters
   // If it's mostly one character or has obvious patterns, it's probably not encrypted

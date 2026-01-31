@@ -107,6 +107,7 @@ export default function DiaryPage() {
   const [selectedDate, setSelectedDate] = useState<string | undefined>(
     undefined
   );
+  const [todayEntry,setTodayEntry] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
   const [displayName, setDisplayName] = useState<string | null>(null);
 
@@ -118,23 +119,28 @@ export default function DiaryPage() {
   const loadData = useCallback(async (userId: string) => {
     const supabase = createClient();
 
-    // Load entries
-    const { data: entriesData } = await supabase
-      .from("diary_entries")
-      .select("entry_date")
-      .eq("user_id", userId)
-      .order("entry_date", { ascending: false });
+    // Load all data in parallel for faster loading
+    const [entriesResult, streakResult, settings] = await Promise.all([
+      supabase
+        .from("diary_entries")
+        .select("entry_date")
+        .eq("user_id", userId)
+        .order("entry_date", { ascending: false }),
+      getStreakData(userId),
+      getUserSettings(userId),
+    ]);
 
-    if (entriesData) {
-      setEntries(entriesData);
+    const today = format(new Date(), "yyyy-MM-dd");
+
+    if (entriesResult.data) {
+      setEntries(entriesResult.data);
+      if (entriesResult.data.length > 0 && entriesResult.data[0].entry_date === today) {
+        setTodayEntry(true);
+      }
     }
 
-    // Load streak data
-    const streakResult = await getStreakData(userId);
     setStreakData(streakResult);
 
-    // Load user settings
-    const settings = await getUserSettings(userId);
     if (settings?.display_name) {
       setDisplayName(settings.display_name);
     }
@@ -156,7 +162,10 @@ export default function DiaryPage() {
 
       setUser(currentUser);
 
-      // Check if PIN is required
+      // Start loading data immediately while checking PIN status in parallel
+      const dataLoadPromise = loadData(currentUser.id);
+
+      // Check if PIN is required (runs in parallel with data loading)
       const pinEnabled = await isPinEnabled(currentUser.id);
 
       if (pinEnabled) {
@@ -176,8 +185,8 @@ export default function DiaryPage() {
 
       setCheckingPin(false);
 
-      // Load data regardless (will show after PIN verification)
-      await loadData(currentUser.id);
+      // Wait for data to finish loading (likely already done)
+      await dataLoadPromise;
     };
 
     initPage();
@@ -247,6 +256,7 @@ export default function DiaryPage() {
               longestStreak={streakData?.longestStreak ?? 0}
               totalEntries={streakData?.totalEntries ?? 0}
               streakActive={streakData?.streakActive ?? false}
+              todayEntry={todayEntry}
             />
             <CalendarGrid
               entryDates={entryDates}

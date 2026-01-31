@@ -7,6 +7,7 @@ interface StreakDisplayProps {
   longestStreak: number;
   totalEntries?: number;
   streakActive?: boolean;
+  todayEntry?:boolean;
 }
 
 function getStreakMessage(streak: number): string {
@@ -36,6 +37,7 @@ export default function StreakDisplay({
   longestStreak,
   totalEntries = 0,
   streakActive = false,
+  todayEntry=false
 }: StreakDisplayProps) {
   const isNewRecord = currentStreak > 0 && currentStreak >= longestStreak;
 
@@ -140,7 +142,7 @@ export default function StreakDisplay({
           }
         `}
       >
-        {streakActive
+        {streakActive && todayEntry
           ? "✓ You've written today!"
           : currentStreak > 0
           ? "⏰ Write today to keep your streak!"
