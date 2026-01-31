@@ -60,10 +60,10 @@ function LoginContent() {
         password,
       })
       if (error) throw error
-      router.replace("/diary")
+      // Use window.location for full page navigation to ensure auth state is refreshed
+      window.location.href = "/diary"
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred")
-    } finally {
       setIsLoading(false)
     }
   }
