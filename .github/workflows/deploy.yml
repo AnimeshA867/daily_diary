@@ -1,0 +1,24 @@
+name: Deploy to AWS
+on:
+  push:
+    branches:
+      - "master"
+      - "main"
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: SSH and Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.AWS_HOST }}
+          username: ${{ secrets.AWS_USERNAME }}
+          key: ${{ secrets.AWS_SSH_KEY }}
+          scripts: |
+            cd ~/daily_diary
+            git pull origin master
+            echo ${{ secrets.ENV_FILE }} >> .env.local 
+            npm install
+            npm run build
+            npm run start
