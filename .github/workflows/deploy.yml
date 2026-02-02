@@ -15,7 +15,7 @@ jobs:
           host: ${{ secrets.AWS_HOST }}
           username: ${{ secrets.AWS_USERNAME }}
           key: ${{ secrets.AWS_SSH_KEY }}
-          scripts: |
+          script: |
             cd ~/daily_diary
             git pull origin master
             echo ${{ secrets.ENV_FILE }} >> .env.local 
