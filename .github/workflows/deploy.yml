@@ -1,33 +1,41 @@
-name: Deploy to AWS
+name: Deploy to AWS Production
 on:
   push:
-    branches:
-      - "master"
-      - "main"
+    branches: ["main", "master"]
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: "Copy Environtment File"
-        env:
-          MY_SECRETS: ${{ secrets.ENV_FILE }}
-        run: |
-          # Using the variable instead of the direct secret prevents shell parsing errors
-          echo "$MY_SECRETS" >> ~/daily_diary/.env.local
-
-          # Verification (Checking byte size)
-          echo "Checking file size:"
-          ls -l ~/daily_diary/env.local
-          cat ~/daily_diary/.env.local
       - name: SSH and Deploy
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.0.3 # Use a specific version for stability
         with:
           host: ${{ secrets.AWS_HOST }}
           username: ${{ secrets.AWS_USER }}
           key: ${{ secrets.AWS_SSH_KEY }}
+          # 1. Tell the action which local env variables to pass to AWS
+          envs: PROD_ENV_CONTENT
+          # 2. Use the pipe (|) for multi-line scripts to avoid 'unexpected value'
           script: |
-            cd ~/daily_diary
+            # Navigate to your project
+            cd ~/daily_diary || { echo "Directory not found"; exit 1; }
+
+            # Pull latest code
+            git pull origin master
+
+            # Create the production env file
+            # Wrapping PROD_ENV_CONTENT in quotes is what preserves your 50+ lines
+            echo "$PROD_ENV_CONTENT" > .env.production
+
+            # Verification check
+            echo "Env file updated. Bytes: $(stat -c%s .env.production)"
+
+            # Standard Next.js Production Build
             npm install
-            echo ${{ secrets.ENV_FILE }} > .env.local
-            npm run dev
+            npm run build
+
+            # Restart with PM2 (assumes you have it installed on AWS)
+            pm2 restart daily-diary || pm2 start npm --name "daily-diary" -- start
+        env:
+          # 3. Map the secret to a variable here (outside the 'with' block)
+          PROD_ENV_CONTENT: ${{ secrets.ENV_FILE }}
