@@ -29,5 +29,5 @@ jobs:
           script: |
             cd ~/daily_diary
             npm install
-            npm run build
-            pm2 restart all
+            echo ${{ secrets.ENV_FILE }} > .env.local
+            npm run dev
