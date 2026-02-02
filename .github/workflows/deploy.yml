@@ -14,7 +14,7 @@ jobs:
           MY_SECRETS: ${{ secrets.ENV_FILE }}
         run: |
           # Using the variable instead of the direct secret prevents shell parsing errors
-          echo "$MY_SECRETS" > ~/daily_diary/.env.local
+          echo "$MY_SECRETS" >> ~/daily_diary/.env.local
 
           # Verification (Checking byte size)
           echo "Checking file size:"
