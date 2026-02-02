@@ -14,12 +14,12 @@ jobs:
           MY_SECRETS: ${{ secrets.ENV_FILE }}
         run: |
           # Using the variable instead of the direct secret prevents shell parsing errors
-          echo "$MY_SECRETS" > .env.production
+          echo "$MY_SECRETS" > ~/daily_diary.env.local
 
           # Verification (Checking byte size)
           echo "Checking file size:"
-          ls -l .env.production
-          cat .env.production
+          ls -l ~/daily_diary.env.local
+          cat ~/daily_diary.env.local
       - name: SSH and Deploy
         uses: appleboy/ssh-action@master
         with:
