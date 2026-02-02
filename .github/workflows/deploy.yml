@@ -31,8 +31,8 @@ jobs:
             echo "Env file updated. Bytes: $(stat -c%s .env.production)"
 
             # Rebuild and restart Docker containers
-            docker-compose -f docker-compose.yml down
-            docker-compose -f docker-compose.yml up -d --build
+            docker compose -f docker-compose.yml down
+            docker compose -f docker-compose.yml up -d --build
         env:
           # 3. Map the secret to a variable here (outside the 'with' block)
           PROD_ENV_CONTENT: ${{ secrets.ENV_FILE }}
