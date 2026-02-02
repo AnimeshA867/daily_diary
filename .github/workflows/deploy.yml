@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: "Copy Environtment File"
+        run: echo "${{ secrets.ENV_FILE }}" > .env.local
       - name: SSH and Deploy
         uses: appleboy/ssh-action@master
         with:
@@ -17,8 +19,6 @@ jobs:
           key: ${{ secrets.AWS_SSH_KEY }}
           script: |
             cd ~/daily_diary
-            git pull origin master
-            echo ${{ secrets.ENV_FILE }} > .env.local 
             npm install
             npm run build
-            pm2 restart --name daily_diary || pm2 start npm --name daily_diary -- start
+            pm2 restart all
