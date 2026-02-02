@@ -10,7 +10,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: "Copy Environtment File"
-        run: echo "${{ secrets.ENV_FILE }}" > .env.local
+        env:
+          MY_SECRETS: ${{ secrets.ENV_PRODUCTION }}
+        run: |
+          # Using the variable instead of the direct secret prevents shell parsing errors
+          echo "$MY_SECRETS" > .env.production
+
+          # Verification (Checking byte size)
+          echo "Checking file size:"
+          ls -l .env.production
       - name: SSH and Deploy
         uses: appleboy/ssh-action@master
         with:
