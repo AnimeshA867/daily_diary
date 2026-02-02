@@ -20,5 +20,4 @@ jobs:
             git pull origin master
             echo ${{ secrets.ENV_FILE }} >> .env.local 
             npm install
-            npm run build
-            npm run start
+            npm run dev
