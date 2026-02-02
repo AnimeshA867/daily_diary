@@ -21,5 +21,4 @@ jobs:
             echo ${{ secrets.ENV_FILE }} > .env.local 
             npm install
             npm run build
-            npm run start
-            timeout: 600
+            pm2 restart --name daily_diary || pm2 start npm --name daily_diary -- start
