@@ -21,3 +21,5 @@ jobs:
             echo ${{ secrets.ENV_FILE }} > .env.local 
             npm install
             npm run build
+            npm run start
+            timeout: 600
