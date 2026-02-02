@@ -30,12 +30,9 @@ jobs:
             # Verification check
             echo "Env file updated. Bytes: $(stat -c%s .env.production)"
 
-            # Standard Next.js Production Build
-            npm install
-            npm run build
-
-            # Restart with PM2 (assumes you have it installed on AWS)
-            pm2 restart daily-diary || pm2 start npm --name "daily-diary" -- start
+            # Rebuild and restart Docker containers
+            docker-compose -f docker-compose.yml down
+            docker-compose -f docker-compose.yml up -d --build
         env:
           # 3. Map the secret to a variable here (outside the 'with' block)
           PROD_ENV_CONTENT: ${{ secrets.ENV_FILE }}
