@@ -103,34 +103,34 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <a
-                  href="mailto:hello@dailydiary.app"
+                  href="mailto:animeshacharya867@gmail.com"
                   className="text-sm text-muted-foreground hover:text-accent transition-colors"
                 >
-                  General: hello@dailydiary.app
+                  General: animeshacharya867@gmail.com
                 </a>
               </li>
               <li>
                 <a
-                  href="mailto:support@dailydiary.app"
+                  href="mailto:animeshacharya867@gmail.com"
                   className="text-sm text-muted-foreground hover:text-accent transition-colors"
                 >
-                  Support: support@dailydiary.app
+                  Support: animeshacharya867@gmail.com
                 </a>
               </li>
               <li>
                 <a
-                  href="mailto:security@dailydiary.app"
+                  href="mailto:animeshacharya867@gmail.com"
                   className="text-sm text-muted-foreground hover:text-accent transition-colors"
                 >
-                  Security: security@dailydiary.app
+                  Security: animeshacharya867@gmail.com
                 </a>
               </li>
               <li>
                 <a
-                  href="mailto:privacy@dailydiary.app"
+                  href="mailto:animeshacharya867@gmail.com"
                   className="text-sm text-muted-foreground hover:text-accent transition-colors"
                 >
-                  Privacy: privacy@dailydiary.app
+                  Privacy: animeshacharya867@gmail.com
                 </a>
               </li>
             </ul>
@@ -145,21 +145,21 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-6">
               <a
-                href="https://github.com/yourusername/daily_diary"
+                href="https://github.com/AnimeshA867/daily_diary"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-muted-foreground hover:text-accent transition-colors"
               >
                 GitHub
               </a>
-              <a
+              {/* <a
                 href="https://twitter.com/dailydiaryapp"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-muted-foreground hover:text-accent transition-colors"
               >
                 Twitter
-              </a>
+              </a> */}
               <Link
                 href="/support"
                 className="text-sm text-muted-foreground hover:text-accent transition-colors"
