@@ -23,6 +23,8 @@ export const metadata: Metadata = {
   keywords: ["diary", "journal", "encrypted", "private", "secure", "personal"],
   authors: [{ name: "Krypt" }],
   creator: "Krypt",
+  publisher: "Krypt",
+  manifest: "/manifest.json",
   metadataBase: new URL("https://krypt.app"),
   openGraph: {
     title: "Krypt - Your Private, Encrypted Journal",
