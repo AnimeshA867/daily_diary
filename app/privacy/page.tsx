@@ -14,7 +14,7 @@ export default function PrivacyPage() {
           <section className="space-y-4">
             <h2 className="text-2xl font-semibold">1. Introduction</h2>
             <p>
-              Welcome to Daily Diary ("we," "our," or "us"). We are committed to
+              Welcome to Krypt ("we," "our," or "us"). We are committed to
               protecting your privacy and ensuring the security of your personal
               information. This Privacy Policy explains how we collect, use,
               disclose, and safeguard your information when you use our diary
@@ -171,7 +171,7 @@ export default function PrivacyPage() {
               </li>
               <li>
                 <strong>Safety:</strong> To protect the rights, property, or
-                safety of Daily Diary, our users, or the public
+                safety of Krypt, our users, or the public
               </li>
               <li>
                 <strong>Business Transfer:</strong> In connection with a merger,
@@ -213,7 +213,7 @@ export default function PrivacyPage() {
             </ul>
             <p>
               To exercise these rights, please contact us at{" "}
-              <strong>privacy@dailydiary.app</strong>
+              <strong>privacy@krypt.app</strong>
               (replace with your actual email).
             </p>
           </section>
@@ -255,7 +255,7 @@ export default function PrivacyPage() {
           <section className="space-y-4">
             <h2 className="text-2xl font-semibold">10. Children's Privacy</h2>
             <p>
-              Daily Diary is not intended for users under the age of 13 (or 16
+              Krypt is not intended for users under the age of 13 (or 16
               in the EU). We do not knowingly collect personal information from
               children. If you believe we have collected information from a
               child, please contact us immediately.
@@ -265,7 +265,7 @@ export default function PrivacyPage() {
           <section className="space-y-4">
             <h2 className="text-2xl font-semibold">11. International Users</h2>
             <p>
-              If you are accessing Daily Diary from outside the United States,
+              If you are accessing Krypt from outside the United States,
               please be aware that your information may be transferred to,
               stored, and processed in the United States. By using our service,
               you consent to this transfer.
@@ -293,10 +293,10 @@ export default function PrivacyPage() {
             </p>
             <div className="bg-muted p-4 rounded-lg">
               <p>
-                <strong>Email:</strong> privacy@dailydiary.app
+                <strong>Email:</strong> privacy@krypt.app
               </p>
               <p>
-                <strong>Website:</strong> https://dailydiary.app
+                <strong>Website:</strong> https://krypt.app
               </p>
             </div>
           </section>
@@ -315,7 +315,7 @@ export default function PrivacyPage() {
               </li>
               <li>
                 <strong>Data Protection Officer:</strong> Contact
-                dpo@dailydiary.app
+                dpo@krypt.app
               </li>
               <li>
                 <strong>Right to Complaint:</strong> You have the right to lodge
@@ -346,7 +346,7 @@ export default function PrivacyPage() {
 
         <div className="mt-12 pt-8 border-t border-border">
           <p className="text-sm text-muted-foreground text-center">
-            By using Daily Diary, you acknowledge that you have read and
+            By using Krypt, you acknowledge that you have read and
             understood this Privacy Policy.
           </p>
         </div>

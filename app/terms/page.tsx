@@ -14,13 +14,13 @@ export default function TermsPage() {
           <section className="space-y-4">
             <h2 className="text-2xl font-semibold">1. Acceptance of Terms</h2>
             <p>
-              Welcome to Daily Diary. By accessing or using our service, you
+              Welcome to Krypt. By accessing or using our service, you
               agree to be bound by these Terms of Service ("Terms"). If you do
               not agree to these Terms, please do not use our service.
             </p>
             <p>
               These Terms constitute a legally binding agreement between you and
-              Daily Diary. We may update these Terms from time to time, and your
+              Krypt. We may update these Terms from time to time, and your
               continued use of the service constitutes acceptance of any
               changes.
             </p>
@@ -31,7 +31,7 @@ export default function TermsPage() {
               2. Description of Service
             </h2>
             <p>
-              Daily Diary is a personal diary application that allows you to
+              Krypt is a personal diary application that allows you to
               create, store, and manage encrypted diary entries. Key features
               include:
             </p>
@@ -48,7 +48,7 @@ export default function TermsPage() {
             <h2 className="text-2xl font-semibold">3. User Accounts</h2>
 
             <h3 className="text-xl font-semibold">3.1 Account Creation</h3>
-            <p>To use Daily Diary, you must:</p>
+            <p>To use Krypt, you must:</p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Be at least 13 years old (or 16 in the EU)</li>
               <li>Provide accurate and complete registration information</li>
@@ -159,8 +159,8 @@ export default function TermsPage() {
           <section className="space-y-4">
             <h2 className="text-2xl font-semibold">6. Intellectual Property</h2>
             <p>
-              The Daily Diary service, including its design, functionality,
-              code, and branding, is owned by Daily Diary and is protected by
+              The Krypt service, including its design, functionality,
+              code, and branding, is owned by Krypt and is protected by
               copyright, trademark, and other intellectual property laws.
             </p>
             <p>You may not:</p>
@@ -208,7 +208,7 @@ export default function TermsPage() {
               8.2 Limitation of Liability
             </h3>
             <p>
-              TO THE MAXIMUM EXTENT PERMITTED BY LAW, DAILY DIARY SHALL NOT BE
+              TO THE MAXIMUM EXTENT PERMITTED BY LAW, KRYPT SHALL NOT BE
               LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR
               PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO LOSS OF DATA, LOSS
               OF PROFITS, OR LOSS OF GOODWILL, ARISING OUT OF OR IN CONNECTION
@@ -226,7 +226,7 @@ export default function TermsPage() {
           <section className="space-y-4">
             <h2 className="text-2xl font-semibold">9. Indemnification</h2>
             <p>
-              You agree to indemnify, defend, and hold harmless Daily Diary and
+              You agree to indemnify, defend, and hold harmless Krypt and
               its officers, directors, employees, and agents from any claims,
               liabilities, damages, losses, and expenses, including reasonable
               attorneys' fees, arising out of or in any way connected with:
@@ -324,7 +324,7 @@ export default function TermsPage() {
             <h3 className="text-xl font-semibold">14.1 Entire Agreement</h3>
             <p>
               These Terms, together with our Privacy Policy, constitute the
-              entire agreement between you and Daily Diary regarding the
+              entire agreement between you and Krypt regarding the
               service.
             </p>
 
@@ -362,10 +362,10 @@ export default function TermsPage() {
             <p>If you have questions about these Terms, please contact us:</p>
             <div className="bg-muted p-4 rounded-lg">
               <p>
-                <strong>Email:</strong> legal@dailydiary.app
+                <strong>Email:</strong> legal@krypt.app
               </p>
               <p>
-                <strong>Website:</strong> https://dailydiary.app
+                <strong>Website:</strong> https://krypt.app
               </p>
             </div>
           </section>
@@ -373,7 +373,7 @@ export default function TermsPage() {
           <section className="space-y-4">
             <h2 className="text-2xl font-semibold">16. Acknowledgment</h2>
             <p>
-              BY USING DAILY DIARY, YOU ACKNOWLEDGE THAT YOU HAVE READ THESE
+              BY USING KRYPT, YOU ACKNOWLEDGE THAT YOU HAVE READ THESE
               TERMS OF SERVICE, UNDERSTAND THEM, AND AGREE TO BE BOUND BY THEM.
             </p>
           </section>

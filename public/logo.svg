@@ -1,0 +1,20 @@
+<svg width="120" height="120" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="kryptBrightOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD700" /> <stop offset="100%" stop-color="#FF9F43" /> </linearGradient>
+  </defs>
+  
+  <path d="M50 8L86.4 29V71L50 92L13.6 71V29L50 8Z" 
+        stroke="url(#kryptBrightOrange)" 
+        stroke-width="3" 
+        stroke-linejoin="round" 
+        fill="rgba(255, 159, 67, 0.08)"/> <path d="M38 32V68M38 50L58 32M38 50L58 68" 
+        stroke="url(#kryptBrightOrange)" 
+        stroke-width="5" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" />
+  
+  <circle cx="58" cy="32" r="2.5" fill="url(#kryptBrightOrange)" />
+  <circle cx="58" cy="68" r="2.5" fill="url(#kryptBrightOrange)" />
+  <circle cx="38" cy="50" r="1.5" fill="#121212" stroke="url(#kryptBrightOrange)" stroke-width="1.2" />
+</svg>

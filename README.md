@@ -1,4 +1,4 @@
-# Daily Diary 📔
+# Krypt 📔
 
 A secure, encrypted personal diary application built with Next.js and Supabase.
 

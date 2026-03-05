@@ -2,7 +2,7 @@
 
 ## Overview
 
-Your Daily Diary application is now production-ready with all essential legal and informational pages!
+Your Krypt application is now production-ready with all essential legal and informational pages!
 
 ## Pages Created
 
@@ -147,14 +147,14 @@ Your Daily Diary application is now production-ready with all essential legal an
 
 📧 **Emails** (Replace these with your actual emails):
 
-- `hello@dailydiary.app` - General inquiries
-- `support@dailydiary.app` - User support
-- `privacy@dailydiary.app` - Privacy questions
-- `security@dailydiary.app` - Security issues
-- `legal@dailydiary.app` - Legal matters
-- `dpo@dailydiary.app` - Data protection officer (GDPR)
+- `hello@krypt.app` - General inquiries
+- `support@krypt.app` - User support
+- `privacy@krypt.app` - Privacy questions
+- `security@krypt.app` - Security issues
+- `legal@krypt.app` - Legal matters
+- `dpo@krypt.app` - Data protection officer (GDPR)
 
-🌐 **Website**: `https://dailydiary.app` (Update with your domain)
+🌐 **Website**: `https://krypt.app` (Update with your domain)
 
 🔗 **Social Media** (Update in footer.tsx):
 
@@ -167,7 +167,7 @@ Your Daily Diary application is now production-ready with all essential legal an
 
 1. **Contact Emails**
 
-   - Replace all `@dailydiary.app` emails with your actual email addresses
+   - Replace all `@krypt.app` emails with your actual email addresses
    - Set up email forwarding or actual inboxes for each address
 
 2. **Domain Name**
@@ -264,7 +264,7 @@ app/
 
 ## Congratulations! 🎉
 
-Your Daily Diary application is now production-ready with:
+Your Krypt application is now production-ready with:
 
 - ✅ Legal protection
 - ✅ User information

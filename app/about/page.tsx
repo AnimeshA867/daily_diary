@@ -3,14 +3,14 @@ export default function AboutPage() {
     <main className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold text-foreground mb-8">
-          About Daily Diary
+          About Krypt
         </h1>
 
         <div className="prose prose-slate dark:prose-invert max-w-none space-y-8 text-foreground">
           <section className="space-y-4">
             <h2 className="text-2xl font-semibold">Our Mission</h2>
             <p className="text-lg">
-              Daily Diary is built on the belief that everyone deserves a
+              Krypt is built on the belief that everyone deserves a
               private, secure space to express their thoughts, track their
               personal growth, and reflect on their experiences.
             </p>
@@ -71,7 +71,7 @@ export default function AboutPage() {
 
           <section className="space-y-4">
             <h2 className="text-2xl font-semibold">Our Technology</h2>
-            <p>Daily Diary is built with modern, secure technologies:</p>
+            <p>Krypt is built with modern, secure technologies:</p>
             <ul className="list-disc pl-6 space-y-2">
               <li>
                 <strong>AES-GCM 256-bit Encryption:</strong> Military-grade
@@ -176,16 +176,16 @@ export default function AboutPage() {
             </p>
             <div className="bg-muted p-6 rounded-lg space-y-2">
               <p>
-                <strong>General Inquiries:</strong> hello@dailydiary.app
+                <strong>General Inquiries:</strong> hello@krypt.app
               </p>
               <p>
-                <strong>Support:</strong> support@dailydiary.app
+                <strong>Support:</strong> support@krypt.app
               </p>
               <p>
-                <strong>Privacy Questions:</strong> privacy@dailydiary.app
+                <strong>Privacy Questions:</strong> privacy@krypt.app
               </p>
               <p>
-                <strong>Security Issues:</strong> security@dailydiary.app
+                <strong>Security Issues:</strong> security@krypt.app
               </p>
             </div>
           </section>

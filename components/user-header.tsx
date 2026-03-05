@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/client";
 import { clearPinSession } from "@/lib/pin";
 import { format } from "date-fns";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
-  BookOpen,
   User,
   LogOut,
   Settings,
@@ -38,10 +38,10 @@ export default function UserHeader({
   const handleLogout = async () => {
     setIsLoading(true);
     clearPinSession();
-    
+
     const supabase = createClient();
     await supabase.auth.signOut();
-    
+
     // Force a hard navigation to clear all state
     window.location.href = "/auth/login";
   };
@@ -55,12 +55,12 @@ export default function UserHeader({
           {/* Logo & Date */}
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-xl bg-accent/10 flex items-center justify-center">
-                <BookOpen className="w-5 h-5 text-accent" />
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden">
+                <Image src="/logo.svg" alt="Krypt Logo" width={36} height={36} className="w-full h-full object-cover" />
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-lg font-semibold text-foreground leading-tight">
-                  Daily Diary
+                  Krypt
                 </h1>
                 <p className="text-xs text-muted-foreground">
                   {format(new Date(), "EEE, MMM d")}
@@ -84,17 +84,15 @@ export default function UserHeader({
                 className={`
                   flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium
                   transition-all duration-300
-                  ${
-                    streakActive
-                      ? "bg-orange-100 text-orange-700 dark:bg-orange-950/50 dark:text-orange-400"
-                      : "bg-muted text-muted-foreground"
+                  ${streakActive
+                    ? "bg-orange-100 text-orange-700 dark:bg-orange-950/50 dark:text-orange-400"
+                    : "bg-muted text-muted-foreground"
                   }
                 `}
               >
                 <Flame
-                  className={`w-4 h-4 ${
-                    streakActive ? "text-orange-500 animate-pulse" : ""
-                  }`}
+                  className={`w-4 h-4 ${streakActive ? "text-orange-500 animate-pulse" : ""
+                    }`}
                 />
                 <span>{currentStreak}</span>
               </div>
@@ -114,9 +112,8 @@ export default function UserHeader({
                   {userName}
                 </span>
                 <ChevronDown
-                  className={`w-4 h-4 text-muted-foreground transition-transform ${
-                    showDropdown ? "rotate-180" : ""
-                  }`}
+                  className={`w-4 h-4 text-muted-foreground transition-transform ${showDropdown ? "rotate-180" : ""
+                    }`}
                 />
               </button>
 

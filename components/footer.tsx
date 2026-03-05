@@ -10,7 +10,7 @@ export default function Footer() {
           {/* About Section */}
           <div>
             <h3 className="text-lg font-semibold text-foreground mb-4">
-              Daily Diary
+              Krypt
             </h3>
             <p className="text-sm text-muted-foreground mb-4">
               Your private, encrypted personal journal. Write freely, knowing
@@ -86,7 +86,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="mailto:legal@dailydiary.app"
+                  href="mailto:legal@krypt.app"
                   className="text-sm text-muted-foreground hover:text-accent transition-colors"
                 >
                   Legal Inquiries
@@ -141,7 +141,7 @@ export default function Footer() {
         <div className="mt-12 pt-8 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-muted-foreground">
-              © {currentYear} Daily Diary. All rights reserved.
+              © {currentYear} Krypt. All rights reserved.
             </p>
             <div className="flex items-center gap-6">
               <a
