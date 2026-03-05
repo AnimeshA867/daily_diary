@@ -1,3 +1,10 @@
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description: "Learn how Krypt protects your privacy, secures your data, and what information we collect when you use our diary application.",
+};
+
 export default function PrivacyPage() {
   return (
     <main className="min-h-screen bg-background">

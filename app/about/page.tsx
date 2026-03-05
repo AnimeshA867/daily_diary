@@ -1,3 +1,10 @@
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About",
+  description: "Learn about Krypt's mission to provide a secure, private space for your personal journaling journey.",
+};
+
 export default function AboutPage() {
   return (
     <main className="min-h-screen bg-background">

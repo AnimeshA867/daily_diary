@@ -1,3 +1,10 @@
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Security",
+  description: "Understand Krypt's military-grade encryption, technical architecture, and our commitment to keeping your personal diary secure.",
+};
+
 export default function SecurityPage() {
   return (
     <main className="min-h-screen bg-background">

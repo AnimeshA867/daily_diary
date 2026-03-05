@@ -166,6 +166,14 @@ export default function Footer() {
               >
                 Help Center
               </Link>
+              <a
+                href="https://www.animeshacharya.com.np"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-muted-foreground hover:text-accent transition-colors"
+              >
+                Developer
+              </a>
             </div>
           </div>
         </div>

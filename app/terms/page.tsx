@@ -1,3 +1,10 @@
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms of Service",
+  description: "Read the Terms of Service for using Krypt, your secure and private personal diary.",
+};
+
 export default function TermsPage() {
   return (
     <main className="min-h-screen bg-background">

@@ -1,4 +1,10 @@
 import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Support & Help",
+  description: "Get support for Krypt. Find frequently asked questions, troubleshooting guides, and contact information.",
+};
 
 export default function SupportPage() {
   return (

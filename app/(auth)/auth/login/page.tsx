@@ -68,7 +68,7 @@ function LoginContent() {
     }
   }
 
-  const handleOAuthLogin = async (provider: "google" ) => {
+  const handleOAuthLogin = async (provider: "google") => {
     const supabase = createClient()
     setOauthLoading(provider)
     setError(null)
@@ -113,7 +113,7 @@ function LoginContent() {
                   )}
                   <span className="ml-2">Continue with Google</span>
                 </Button>
-                
+
               </div>
 
               {/* Divider */}
