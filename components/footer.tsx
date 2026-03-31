@@ -145,7 +145,7 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-6">
               <a
-                href="https://github.com/AnimeshA867/daily_diary"
+                href="https://github.com/AnimeshA867/krypt"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-muted-foreground hover:text-accent transition-colors"
